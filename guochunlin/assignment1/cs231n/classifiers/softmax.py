@@ -1,7 +1,7 @@
 import numpy as np
 from random import shuffle
 from past.builtins import xrange
-
+import math
 def softmax_loss_naive(W, X, y, reg):
   """
   Softmax loss function, naive implementation (with loops)
@@ -30,7 +30,25 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  num_train=X.shape[0]
+  num_classes=W.shape[1]
+  for i in range(num_train):
+    scores=X[i].dot(W)
+    exp_scores=np.zeros(scores.shape)
+    row_sum=0
+    for j in range(num_classes):
+      exp_scores[j]=np.exp(scores[j])
+      row_sum=row_sum+exp_scores[j]
+    loss=loss-np.log(exp_scores[y[i]]/row_sum)
+    for k in range(num_classes):
+      if k !=y[i]:
+        dW[:,k] +=exp_scores[k]/row_sum * X[i]
+      else:
+        dW[:,y[i]] +=(exp_scores[y[i]]/row_sum-1)*X[i]
+  loss=loss/num_train
+  loss=loss + reg * np.sum(W*W)
+  dW=dW/num_train
+  dW=dW+ 2 * reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -54,10 +72,20 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  num_train=X.shape[0]
+  # 计算loss
+  scores=X.dot(W)
+  shift_scores=scores-np.max(scores,axis=1).reshape(-1,1)
+  softmax_output = np.exp(shift_scores) / np.sum(np.exp(shift_scores), axis = 1).reshape((num_train, 1))
+  loss=-np.sum(np.log(softmax_output[range(num_train),list(y)]))#计算loss这一步要注意进行log运算与sum运算的前后区别
+  loss /=num_train
+  loss +=0.5 *reg*np.sum(W*W)
+  dS=softmax_output.copy()
+  dS[range(num_train),list(y)]+=-1 #求导公式，在对Wyi进行求导时会多一个-1
+  dW=(X.T).dot(dS)
+  dW=dW / num_train+reg*W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
-
   return loss, dW
 

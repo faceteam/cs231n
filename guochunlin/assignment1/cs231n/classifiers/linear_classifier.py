@@ -21,10 +21,10 @@ class LinearClassifier(object):
       training samples each of dimension D.
     - y: A numpy array of shape (N,) containing training labels; y[i] = c
       means that X[i] has label 0 <= c < C for C classes.
-    - learning_rate: (float) learning rate for optimization.
-    - reg: (float) regularization strength.
-    - num_iters: (integer) number of steps to take when optimizing
-    - batch_size: (integer) number of training examples to use at each step.
+    - learning_rate: (float) learning rate for optimization. #学习速率
+    - reg: (float) regularization strength. #正则化系数
+    - num_iters: (integer) number of steps to take when optimizing 迭代次数
+    - batch_size: (integer) number of training examples to use at each step. 每次迭代的数量
     - verbose: (boolean) If true, print progress during optimization.
 
     Outputs:
@@ -53,21 +53,21 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      sample_insex=np.random.choice(num_train,batch_size,replace=False)
+      X_batch=X[sample_insex,:]
+      y_batch=y[sample_insex]
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
-
       # evaluate loss and gradient
       loss, grad = self.loss(X_batch, y_batch, reg)
       loss_history.append(loss)
-
       # perform parameter update
       #########################################################################
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      self.W=self.W -learning_rate * grad
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -96,7 +96,8 @@ class LinearClassifier(object):
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    scores=np.dot(X,self.W)
+    y_pred=np.argmax(scores,axis=1)
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
